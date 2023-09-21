@@ -1,0 +1,168 @@
+//Criar um sistema de Eventos na cidade 
+
+package atividade1;
+
+import java.io.*;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+class Usuario {
+    private String nome;
+    private String cidade;
+    private int idade;
+
+    public Usuario(String nome, String cidade, int idade) {
+        this.nome = nome;
+        this.cidade = cidade;
+        this.idade = idade;
+    }
+
+    // Métodos getters e setters
+}
+
+class Evento {
+    private String nome;
+    private String endereco;
+    private String categoria;
+    private LocalDateTime horario;
+    private String descricao;
+
+    public Evento(String nome, String endereco, String categoria, LocalDateTime horario, String descricao) {
+        this.nome = nome;
+        this.endereco = endereco;
+        this.categoria = categoria;
+        this.horario = horario;
+        this.descricao = descricao;
+    }
+
+	public String getNome() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getEndereco() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getCategoria() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public DateTimeFormatter getHorario() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getDescricao() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+    // Métodos getters
+}
+
+public class SistemaEventos {
+    private List<Usuario> usuarios = new ArrayList<>();
+    private List<Evento> eventos = new ArrayList<>();
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    public void cadastrarUsuario(String nome, String cidade, int idade) {
+        Usuario usuario = new Usuario(nome, cidade, idade);
+        usuarios.add(usuario);
+    }
+
+    public void cadastrarEvento(String nome, String endereco, String categoria, String horario, String descricao) {
+        LocalDateTime dataHora = LocalDateTime.parse(horario, formatter);
+        Evento evento = new Evento(nome, endereco, categoria, dataHora, descricao);
+        eventos.add(evento);
+    }
+
+    public void listarEventos() {
+        for (Evento evento : eventos) {
+            System.out.println("Nome: " + evento.getNome());
+            System.out.println("Endereço: " + evento.getEndereco());
+            System.out.println("Categoria: " + evento.getCategoria());
+            System.out.println("Horário: " + evento.getHorario().toFormat());
+            System.out.println("Descrição: " + evento.getDescricao());
+            System.out.println();
+        }
+    }
+
+    // Implemente os métodos para participar e cancelar a participação em eventos
+    // Implemente os métodos para verificar eventos futuros e passados
+
+    public void salvarEventosEmArquivo(String nomeArquivo) {
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(nomeArquivo))) {
+            outputStream.writeObject(eventos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void carregarEventosDeArquivo(String nomeArquivo) {
+        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(nomeArquivo))) {
+            eventos = (List<Evento>) inputStream.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        SistemaEventos sistema = new SistemaEventos();
+        sistema.carregarEventosDeArquivo("events.data");
+
+        Scanner scanner = new Scanner(System.in);
+        boolean sair = false;
+
+        while (!sair) {
+            System.out.println("1. Cadastrar Usuário");
+            System.out.println("2. Cadastrar Evento");
+            System.out.println("3. Listar Eventos");
+            System.out.println("4. Sair");
+            System.out.print("Escolha uma opção: ");
+            int escolha = scanner.nextInt();
+
+            switch (escolha) {
+                case 1:
+                    System.out.print("Nome do usuário: ");
+                    String nomeUsuario = scanner.next();
+                    System.out.print("Cidade do usuário: ");
+                    String cidadeUsuario = scanner.next();
+                    System.out.print("Idade do usuário: ");
+                    int idadeUsuario = scanner.nextInt();
+                    sistema.cadastrarUsuario(nomeUsuario, cidadeUsuario, idadeUsuario);
+                    break;
+                case 2:
+                    System.out.print("Nome do evento: ");
+                    String nomeEvento = scanner.next();
+                    System.out.print("Endereço do evento: ");
+                    String enderecoEvento = scanner.next();
+                    System.out.print("Categoria do evento: ");
+                    String categoriaEvento = scanner.next();
+                    System.out.print("Horário do evento (dd/MM/yyyy HH:mm): ");
+                    String horarioEvento = scanner.next();
+                    scanner.nextLine(); // Consumir a quebra de linha
+                    System.out.print("Descrição do evento: ");
+                    String descricaoEvento = scanner.nextLine();
+                    sistema.cadastrarEvento(nomeEvento, enderecoEvento, categoriaEvento, horarioEvento, descricaoEvento);
+                    break;
+                case 3:
+                    sistema.listarEventos();
+                    break;
+                case 4:
+                    sistema.salvarEventosEmArquivo("events.data");
+                    sair = true;
+                    break;
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        }
+
+        scanner.close();
+    }
